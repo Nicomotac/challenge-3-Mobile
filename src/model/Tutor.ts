@@ -1,8 +1,16 @@
-interface Tutor {
-    id: number | null;
-    nome: string;
-    email: string;
-    telefone: string;
-};
+export interface Tutor {
+  id: number;
+  nome: string;
+  cpf: string | null;
+  dataNascimento: string | null;
+  email: string;
+  celular: string;
+}
 
-export {Tutor};
+export interface TutorPayload {
+  nome: string;
+  cpf: string | null;
+  dataNascimento: string | null;
+  email: string;
+  celular: string;
+}

@@ -1,10 +1,23 @@
-interface Pet {
-  id : number | null;
+export interface Pet {
+  id: number;
   nome: string;
+  idade: number | null;
   especie: string;
-  raca: string;
-  idade: string | number;
-  peso: string | number;
-};
+  raca: string | null;
+  sexo: string;
+  dataNascimento: string | null;
+  peso: number | null;
+  responsavelId: number;
+  responsavelNome: string;
+}
 
-export {Pet};
+export interface PetPayload {
+  nome: string;
+  idade: number | null;
+  especie: string;
+  raca: string | null;
+  sexo: string;
+  dataNascimento: string | null;
+  peso: number | null;
+  responsavelId: number;
+}
