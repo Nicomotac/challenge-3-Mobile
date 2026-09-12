@@ -1,86 +1,17 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import type { DrawerScreenProps } from "@react-navigation/drawer";
-import type { RootDrawerParamList } from "../navigation/navigation";
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
-type Props = DrawerScreenProps<RootDrawerParamList, "Home"> & {
-  token: string;
-};
-
-const HomeScreen: React.FC<Props> = ({ token }) => {
+export default function HomeScreen() {
+  const { usuario } = useAuth();
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Clyvo PetCare</Text>
-
-      <Text style={styles.subtitulo}>
-        Cuidado contínuo, preventivo e inteligente para a saúde do seu pet.
-      </Text>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Bem-vindo!</Text>
-        <Text style={styles.text}>
-          Use o menu lateral para acessar o cadastro do pet, veterinário,
-          cuidados, triagem de risco e histórico.
-        </Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Objetivo do App</Text>
-        <Text style={styles.text}>
-          Ajudar tutores a manterem a continuidade do cuidado do pet, evitando
-          esquecimentos de vacinas, retornos, exames e sinais de risco.
-        </Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Status</Text>
-        <Text style={styles.text}>Usuário logado</Text>
-      </View>
+      <Text style={styles.subtitle}>Cuidado contínuo e inteligente para pets.</Text>
+      <View style={styles.card}><Text style={styles.cardTitle}>Usuário</Text><Text>{usuario?.nome}</Text><Text>Perfil: {usuario?.role}</Text></View>
+      <View style={styles.card}><Text style={styles.cardTitle}>Como usar</Text><Text>Use o menu lateral para acessar Tutores, Pets, painel veterinário, cuidados, triagem, histórico e o Assistente IA.</Text></View>
+      <View style={styles.card}><Text style={styles.cardTitle}>Permissões</Text><Text>ADMIN pode criar, editar e excluir. USER pode consultar os dados cadastrados.</Text></View>
     </ScrollView>
   );
-};
-
-export default HomeScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "#f8fafc",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#1e293b",
-    marginBottom: 8,
-  },
-  subtitulo: {
-    fontSize: 16,
-    color: "#475569",
-    marginBottom: 24,
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    marginBottom: 14,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#2563eb",
-    marginBottom: 8,
-  },
-  text: {
-    fontSize: 15,
-    color: "#475569",
-    lineHeight: 22,
-  },
-  token: {
-    fontSize: 12,
-    color: "#64748b",
-    marginTop: 8,
-  },
-});
+}
+const styles = StyleSheet.create({ container: { flex: 1, padding: 20, backgroundColor: '#f8fafc' }, title: { fontSize: 30, fontWeight: 'bold', color: '#1e293b' }, subtitle: { color: '#64748b', marginTop: 5, marginBottom: 20 }, card: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 16, marginBottom: 12 }, cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#2563eb', marginBottom: 7 } });

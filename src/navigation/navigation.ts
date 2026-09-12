@@ -1,11 +1,16 @@
-// Navegação entre telas usando React Navigation e RootDrawerParamList para tipagem das rotas
+export type PublicStackParamList = {
+  Login: undefined;
+  Cadastro: undefined;
+};
 
 export type RootDrawerParamList = {
   Home: undefined;
-  CadastroPet: undefined;
-  Vet: undefined;
+  Tutores: undefined;
+  Pets: undefined;
+  Veterinario: undefined;
   Cuidados: undefined;
   Triagem: undefined;
+  AssistenteIA: undefined;
   Historico: undefined;
-  LogOut: undefined;
+  Perfil: undefined;
 };
