@@ -1,61 +1,52 @@
-# Challenge_Mobile
+# Clyvo PetCare — Sprint 3 Mobile Application Development
 
-GRUPO C.E.N²
+**GRUPO**
+Caio Kenzo Tayra - RM562979 Enzo Vieira Bernardini - RMRM563000 Nícolas Mota Cândido - RM561857
 
-# Integrantes
+Aplicativo **React Native + Expo + TypeScript**, evoluído a partir da estrutura dos exemplos das Sprints anteriores (`model`, `control`, `services`, `screen`, `navigation`).
 
-Caio Kenzo Tayra - RM562979
-Enzo Vieira Bernardini - RMRM563000
-Natan Freitas de Moraes - RMRM5649
-Nícolas Mota Cândido - RM561857
-
-
-# Clyvo PetCare - Mobile Application Development
-
-## Sobre o projeto
-
-O **Clyvo PetCare** é um aplicativo mobile desenvolvido em **React Native com Expo** para apoiar a continuidade do cuidado e o acompanhamento da jornada de saúde dos pets.
-
-A proposta do app é ajudar tutores a registrarem informações do pet, acompanharem cuidados preventivos, realizarem uma triagem inicial de risco e consultarem um histórico local dos dados salvos.
-
-O projeto foi desenvolvido como parte do Challenge 2026 da FIAP, com foco no tema:
-
-> Continuidade do cuidado e engajamento na jornada de saúde do pet.
-
----
-
-## Objetivo da solução
-
-O aplicativo busca resolver problemas comuns na jornada de cuidado animal, como:
-
-- Esquecimento de vacinas, retornos e check-ups;
-- Falta de acompanhamento contínuo do pet;
-- Dificuldade do tutor em registrar sintomas e informações importantes;
-- Ausência de histórico simples para consulta rápida;
-- Baixa previsibilidade sobre cuidados preventivos.
-
----
-
-## Tecnologias utilizadas
-
-- React Native
-- Expo
+## Tecnologias
+- React Native + Expo
 - TypeScript
-- React Navigation
-- Drawer Navigator
+- React Navigation (Native Stack + Drawer)
+- TanStack Query
+- Axios
+- Yup
 - AsyncStorage
-- Git e GitHub
+- API Java Spring Boot
 
----
+## Requisitos atendidos
+- 6+ telas reais com React Navigation
+- autenticação real pela API Java
+- cadastro de usuário
+- persistência da sessão
+- proteção das rotas e logout
+- perfis ADMIN e USER retornados pela API
+- CRUD completo de Tutores
+- CRUD completo de Pets
+- TanStack Query (`useQuery`, `useMutation`, `invalidateQueries`)
+- estados de loading/erro
+- camada `model` como nos exemplos do projeto
+- validação simples dos formulários com Yup
+- tela Assistente IA simulada usando pet real da API como contexto
 
-## Funcionalidades implementadas
+## Perfis de demonstração
+- ADMIN: `admin` / `123`
+- USER: `user` / `123`
 
-### Login simulado
+ADMIN pode cadastrar, editar e excluir. USER pode consultar.
 
-O app possui uma tela inicial de login antes de liberar o acesso às telas internas.
+## Executar Mobile no Android Emulator
+Na pasta `mobile`:
 
-Login de teste:
+```cmd
+npm install
+npx expo start
+```
 
-```txt
-Email: admin@clyvo.com
-Senha: 123456
+## LINK DA API JAVA
+
+https://github.com/Nicomotac/API-JAVA-SPRINT-3
+
+
+
