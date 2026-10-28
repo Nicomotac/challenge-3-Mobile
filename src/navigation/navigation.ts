@@ -1,3 +1,4 @@
+import { createNavigationContainerRef } from '@react-navigation/native';
 export type PublicStackParamList = {
   Login: undefined;
   Cadastro: undefined;
@@ -13,4 +14,7 @@ export type RootDrawerParamList = {
   AssistenteIA: undefined;
   Historico: undefined;
   Perfil: undefined;
+  SobreApp: undefined;
 };
+
+export const navigationRef = createNavigationContainerRef<RootDrawerParamList>();

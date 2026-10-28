@@ -1,21 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { petService } from '../services/petService';
+import type { PetPayload } from '../model/Pet';
 
 export function usePets() {
   return useQuery({ queryKey: ['pets'], queryFn: petService.listar });
 }
 
-export function useCriarPet() {
-  const client = useQueryClient();
-  return useMutation({ mutationFn: petService.criar, onSuccess: () => client.invalidateQueries({ queryKey: ['pets'] }) });
-}
+export function useOperacoesPet() {
+  const queryClient = useQueryClient();
+  const atualizarLista = () => queryClient.invalidateQueries({ queryKey: ['pets'] });
 
-export function useAtualizarPet() {
-  const client = useQueryClient();
-  return useMutation({ mutationFn: petService.atualizar, onSuccess: () => client.invalidateQueries({ queryKey: ['pets'] }) });
-}
+  const criar = useMutation({
+    mutationFn: (dados: PetPayload) => petService.criar(dados),
+    onSuccess: atualizarLista,
+  });
+  const atualizar = useMutation({
+    mutationFn: ({ id, dados }: { id: number; dados: PetPayload }) =>
+      petService.atualizar({ id, dados }),
+    onSuccess: atualizarLista,
+  });
+  const excluir = useMutation({
+    mutationFn: (id: number) => petService.excluir(id),
+    onSuccess: atualizarLista,
+  });
 
-export function useExcluirPet() {
-  const client = useQueryClient();
-  return useMutation({ mutationFn: petService.excluir, onSuccess: () => client.invalidateQueries({ queryKey: ['pets'] }) });
+  return { criar, atualizar, excluir };
 }
