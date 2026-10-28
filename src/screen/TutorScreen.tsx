@@ -1,70 +1,131 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { useAtualizarTutor, useCriarTutor, useExcluirTutor, useTutores } from '../control/useTutorControl';
-import { Tutor } from '../model/Tutor';
+import React from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Text from '../components/ThemedText';
+import { useTutorFormulario } from '../control/useTutorFormulario';
 import { mensagemErroApi } from '../services/api';
-import { primeiraMensagemYup, tutorSchema } from '../validation/schemas';
-
-const vazio = { nome: '', cpf: '', dataNascimento: '', email: '', celular: '' };
+import { useTema, type Cores } from '../theme/ThemeContext';
 
 export default function TutorScreen() {
-  const { usuario } = useAuth();
-  const admin = usuario?.role === 'ADMIN';
-  const tutores = useTutores();
-  const criar = useCriarTutor();
-  const atualizar = useAtualizarTutor();
-  const excluir = useExcluirTutor();
-  const [form, setForm] = useState(vazio);
-  const [editandoId, setEditandoId] = useState<number | null>(null);
-  const [erro, setErro] = useState('');
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
+  const {
+    admin, tutores, form, setForm, editandoId, erro, pendente,
+    limpar, editar, salvar, confirmarExclusao,
+  } = useTutorFormulario();
 
-  function limpar() { setForm(vazio); setEditandoId(null); setErro(''); }
-  function editar(item: Tutor) {
-    setEditandoId(item.id);
-    setForm({ nome: item.nome, cpf: item.cpf || '', dataNascimento: item.dataNascimento || '', email: item.email, celular: item.celular });
+  function campo(chave: keyof typeof form, titulo: string, tipo: 'default' | 'email-address' | 'phone-pad' = 'default') {
+    return (
+      <TextInput
+        style={styles.input}
+        placeholder={titulo}
+        placeholderTextColor={cores.textoSecundario}
+        keyboardType={tipo}
+        autoCapitalize={tipo === 'email-address' ? 'none' : 'sentences'}
+        value={form[chave]}
+        onChangeText={(valor) => setForm((anterior) => ({ ...anterior, [chave]: valor }))}
+      />
+    );
   }
-  async function salvar() {
-    setErro('');
-    const payload = { nome: form.nome.trim(), cpf: form.cpf.trim() || null, dataNascimento: form.dataNascimento.trim() || null, email: form.email.trim(), celular: form.celular.trim() };
-    try {
-      await tutorSchema.validate(payload);
-      if (editandoId) await atualizar.mutateAsync({ id: editandoId, dados: payload });
-      else await criar.mutateAsync(payload);
-      limpar();
-    } catch (error) {
-      if (error && typeof error === 'object' && 'name' in error && error.name === 'ValidationError') setErro(primeiraMensagemYup(error));
-      else setErro(mensagemErroApi(error));
-    }
-  }
-  function confirmarExcluir(id: number) {
-    Alert.alert('Excluir tutor?', 'Pets vinculados devem ser excluídos antes.', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive', onPress: async () => { try { await excluir.mutateAsync(id); } catch (error) { Alert.alert('Erro', mensagemErroApi(error)); } } },
-    ]);
-  }
+
+  const formulario = admin ? (
+    <View style={styles.card}>
+      <Text style={styles.subtitulo}>{editandoId !== null ? 'Editar tutor' : 'Cadastrar tutor'}</Text>
+      {campo('nome', 'Nome')}
+      {campo('email', 'E-mail', 'email-address')}
+      {campo('celular', 'Celular', 'phone-pad')}
+      {campo('cpf', 'CPF (opcional)')}
+      {campo('dataNascimento', 'Nascimento AAAA-MM-DD (opcional)')}
+      {!!erro && <Text style={styles.erro}>{erro}</Text>}
+      <TouchableOpacity style={styles.primario} onPress={salvar} disabled={pendente}>
+        <Text style={styles.botaoTexto}>
+          {pendente ? 'Salvando...' : editandoId !== null ? 'Salvar alteração' : 'Cadastrar'}
+        </Text>
+      </TouchableOpacity>
+      {editandoId !== null && (
+        <TouchableOpacity style={styles.botaoSecundario} onPress={limpar}>
+          <Text>Cancelar edição</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  ) : null;
 
   return (
-    <View style={styles.container}>
-      {admin && (
-        <View style={styles.form}>
-          <Text style={styles.formTitle}>{editandoId ? 'Editar tutor' : 'Cadastrar tutor'}</Text>
-          <TextInput style={styles.input} placeholder="Nome" value={form.nome} onChangeText={(v) => setForm({ ...form, nome: v })} />
-          <TextInput style={styles.input} placeholder="E-mail" value={form.email} onChangeText={(v) => setForm({ ...form, email: v })} autoCapitalize="none" />
-          <TextInput style={styles.input} placeholder="Celular" value={form.celular} onChangeText={(v) => setForm({ ...form, celular: v })} keyboardType="phone-pad" />
-          <TextInput style={styles.input} placeholder="CPF (opcional)" value={form.cpf} onChangeText={(v) => setForm({ ...form, cpf: v })} />
-          <TextInput style={styles.input} placeholder="Nascimento AAAA-MM-DD (opcional)" value={form.dataNascimento} onChangeText={(v) => setForm({ ...form, dataNascimento: v })} />
-          {!!erro && <Text style={styles.error}>{erro}</Text>}
-          <TouchableOpacity style={styles.primary} onPress={salvar} disabled={criar.isPending || atualizar.isPending}><Text style={styles.primaryText}>{editandoId ? 'Salvar alteração' : 'Cadastrar'}</Text></TouchableOpacity>
-          {editandoId && <TouchableOpacity style={styles.cancel} onPress={limpar}><Text>Cancelar edição</Text></TouchableOpacity>}
+    <FlatList
+      style={styles.pagina}
+      contentContainerStyle={styles.conteudo}
+      data={tutores.data ?? []}
+      keyExtractor={(item) => String(item.id)}
+      refreshing={tutores.isFetching}
+      onRefresh={() => { void tutores.refetch(); }}
+      ListHeaderComponent={
+        <View>
+          <Text style={styles.titulo}>Tutores</Text>
+          {formulario}
+          {tutores.isLoading && <ActivityIndicator color={cores.primaria} />}
+          {tutores.isError && <Text style={styles.erro}>{mensagemErroApi(tutores.error)}</Text>}
+        </View>
+      }
+      ListEmptyComponent={!tutores.isLoading && !tutores.isError ? (
+        <Text style={styles.vazio}>Nenhum tutor cadastrado.</Text>
+      ) : null}
+      renderItem={({ item }) => (
+        <View style={styles.card}>
+          <Text style={styles.nome}>{item.nome}</Text>
+          <Text>{item.email}</Text>
+          <Text>{item.celular}</Text>
+          {admin && (
+            <View style={styles.acoes}>
+              <TouchableOpacity style={styles.bordaBotao} disabled={pendente} onPress={() => editar(item)}>
+                <Text style={styles.editar}>Editar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.perigo} disabled={pendente} onPress={() => confirmarExclusao(item.id)}>
+                <Text style={styles.botaoTexto}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
-      {tutores.isLoading && <ActivityIndicator color="#2563eb" />}
-      {tutores.isError && <Text style={styles.error}>{mensagemErroApi(tutores.error)}</Text>}
-      <FlatList data={tutores.data || []} keyExtractor={(item) => String(item.id)} refreshing={tutores.isFetching} onRefresh={tutores.refetch} ListEmptyComponent={!tutores.isLoading ? <Text style={styles.empty}>Nenhum tutor cadastrado.</Text> : null} renderItem={({ item }) => (
-        <View style={styles.card}><Text style={styles.name}>{item.nome}</Text><Text>{item.email}</Text><Text>{item.celular}</Text>{admin && <View style={styles.row}><TouchableOpacity style={styles.secondary} onPress={() => editar(item)}><Text style={styles.secondaryText}>Editar</Text></TouchableOpacity><TouchableOpacity style={styles.danger} onPress={() => confirmarExcluir(item.id)}><Text style={styles.dangerText}>Excluir</Text></TouchableOpacity></View>}</View>
-      )} />
-    </View>
+    />
   );
 }
-const styles = StyleSheet.create({ container: { flex: 1, padding: 16, backgroundColor: '#f8fafc' }, form: { backgroundColor: '#fff', padding: 14, borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', marginBottom: 12 }, formTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, color: '#1e293b' }, input: { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 8, padding: 10, marginBottom: 8 }, primary: { backgroundColor: '#2563eb', padding: 12, borderRadius: 8 }, primaryText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' }, cancel: { padding: 10, alignItems: 'center', marginTop: 7 }, error: { color: '#dc2626', marginBottom: 8, fontWeight: 'bold' }, card: { backgroundColor: '#fff', padding: 14, borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', marginBottom: 10 }, name: { fontSize: 17, fontWeight: 'bold', color: '#1e293b' }, row: { flexDirection: 'row', gap: 8, marginTop: 10 }, secondary: { flex: 1, borderWidth: 1, borderColor: '#2563eb', padding: 10, borderRadius: 8, alignItems: 'center' }, secondaryText: { color: '#2563eb', fontWeight: 'bold' }, danger: { flex: 1, backgroundColor: '#dc2626', padding: 10, borderRadius: 8, alignItems: 'center' }, dangerText: { color: '#fff', fontWeight: 'bold' }, empty: { textAlign: 'center', color: '#64748b', marginTop: 20 } });
+
+const criarEstilos = (cores: Cores) => StyleSheet.create({
+  pagina: { flex: 1, backgroundColor: cores.fundo },
+  conteudo: { padding: 16, paddingBottom: 36 },
+  titulo: { fontSize: 26, fontWeight: 'bold', marginBottom: 14 },
+  subtitulo: { fontWeight: 'bold', fontSize: 18, marginBottom: 12 },
+  card: {
+    padding: 14,
+    marginBottom: 12,
+    backgroundColor: cores.superficie,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    borderRadius: 12,
+  },
+  input: {
+    color: cores.texto,
+    backgroundColor: cores.superficie,
+    borderColor: cores.borda,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  primario: { backgroundColor: '#2563eb', padding: 13, borderRadius: 8 },
+  botaoTexto: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
+  botaoSecundario: { padding: 12, alignItems: 'center' },
+  erro: { color: cores.perigo, marginBottom: 9 },
+  nome: { fontWeight: 'bold', fontSize: 18, marginBottom: 5 },
+  acoes: { flexDirection: 'row', gap: 10, marginTop: 10 },
+  bordaBotao: { flex: 1, borderWidth: 1, borderColor: cores.primaria, padding: 10, borderRadius: 8 },
+  editar: { textAlign: 'center', color: cores.primaria, fontWeight: 'bold' },
+  perigo: { flex: 1, backgroundColor: '#dc2626', padding: 10, borderRadius: 8 },
+  vazio: { textAlign: 'center', color: cores.textoSecundario, marginTop: 15 },
+});

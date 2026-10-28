@@ -1,17 +1,124 @@
-import React, { useMemo, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { usePets } from '../control/usePetControl';
-import { respostaIASimulada } from '../services/iaService';
-
-type Mensagem = { id: string; autor: 'usuario' | 'ia'; texto: string };
+import React from 'react';
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Text from '../components/ThemedText';
+import { useAssistenteControl } from '../control/useAssistenteControl';
+import { useTema, type Cores } from '../theme/ThemeContext';
 
 export default function AssistenteIAScreen() {
-  const pets = usePets();
-  const [petId, setPetId] = useState<number | null>(null);
-  const [texto, setTexto] = useState('');
-  const [mensagens, setMensagens] = useState<Mensagem[]>([{ id: 'inicio', autor: 'ia', texto: 'Olá! Selecione um pet e faça uma pergunta sobre cuidados, vacinas ou acompanhamento.' }]);
-  const pet = useMemo(() => (pets.data || []).find((p) => p.id === petId) || null, [pets.data, petId]);
-  function enviar() { const pergunta = texto.trim(); if (!pergunta) return; const id = Date.now(); setMensagens((m) => [...m, { id: `u-${id}`, autor: 'usuario', texto: pergunta }, { id: `ia-${id}`, autor: 'ia', texto: respostaIASimulada(pergunta, pet) }]); setTexto(''); }
-  return <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><Text style={styles.title}>Assistente Clyvo IA</Text><Text style={styles.badge}>SIMULAÇÃO ACADÊMICA</Text><Text style={styles.subtitle}>Conversa simulada usando o pet real da API como contexto.</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pets}>{(pets.data || []).map((p) => <TouchableOpacity key={p.id} style={[styles.pet, petId === p.id && styles.petSelected]} onPress={() => setPetId(p.id)}><Text style={petId === p.id ? styles.petTextSelected : styles.petText}>{p.nome}</Text></TouchableOpacity>)}</ScrollView><FlatList style={styles.chat} data={mensagens} keyExtractor={(m) => m.id} renderItem={({ item }) => <View style={[styles.message, item.autor === 'usuario' ? styles.user : styles.ia]}><Text style={item.autor === 'usuario' ? styles.userText : styles.iaText}>{item.texto}</Text></View>} /><View style={styles.inputRow}><TextInput style={styles.input} placeholder="Ex.: quais cuidados com vacinas?" value={texto} onChangeText={setTexto} onSubmitEditing={enviar} /><TouchableOpacity style={styles.send} onPress={enviar}><Text style={styles.sendText}>Enviar</Text></TouchableOpacity></View><Text style={styles.disclaimer}>Não substitui orientação veterinária.</Text></KeyboardAvoidingView>;
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
+  const {
+    pets, historico, petId, selecionarPet, texto, setTexto, mensagens, erro, enviar,
+  } = useAssistenteControl();
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.pagina}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <Text style={styles.titulo}>Assistente de Cuidados</Text>
+      <Text style={styles.subtitulo}>
+        Consulte informações do pet cadastrado e seus registros de triagem.
+      </Text>
+      <ScrollView horizontal style={styles.pets} showsHorizontalScrollIndicator={false}>
+        {(pets.data ?? []).map((pet) => (
+          <TouchableOpacity
+            key={pet.id}
+            style={[styles.chip, petId === pet.id && styles.chipAtivo]}
+            onPress={() => selecionarPet(pet.id)}
+          >
+            <Text style={petId === pet.id ? styles.chipTextoAtivo : undefined}>{pet.nome}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      {pets.isError && <Text style={styles.erro}>Falha ao carregar os pets da API.</Text>}
+      {historico.isError && <Text style={styles.erro}>Falha ao consultar o histórico.</Text>}
+      {!!erro && <Text style={styles.erro}>{erro}</Text>}
+      <FlatList
+        ListEmptyComponent={
+          <Text style={styles.subtitulo}>
+            Selecione um pet e pergunte sobre dados, vacinação, alimentação ou triagens.
+          </Text>
+        }
+        style={styles.chat}
+        data={mensagens}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={[
+            styles.mensagem,
+            item.autor === 'usuario' ? styles.mensagemUsuario : styles.mensagemAssistente,
+          ]}>
+            <Text style={item.autor === 'usuario' ? styles.textoUsuario : undefined}>
+              {item.texto}
+            </Text>
+          </View>
+        )}
+      />
+      <View style={styles.entrada}>
+        <TextInput
+          style={styles.input}
+          value={texto}
+          onChangeText={setTexto}
+          placeholder="Ex.: quais cuidados com vacinas?"
+          placeholderTextColor={cores.textoSecundario}
+          onSubmitEditing={enviar}
+        />
+        <TouchableOpacity style={styles.enviar} onPress={enviar}>
+          <Text style={styles.textoUsuario}>Enviar</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.rodape}>Não substitui atendimento veterinário.</Text>
+    </KeyboardAvoidingView>
+  );
 }
-const styles = StyleSheet.create({ container: { flex: 1, padding: 16, backgroundColor: '#f8fafc' }, title: { fontSize: 26, fontWeight: 'bold', color: '#1e293b' }, badge: { color: '#2563eb', fontWeight: 'bold', marginTop: 4 }, subtitle: { color: '#64748b', marginVertical: 9 }, pets: { maxHeight: 45, marginBottom: 10 }, pet: { paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 18, marginRight: 7, backgroundColor: '#fff' }, petSelected: { backgroundColor: '#2563eb' }, petText: { color: '#334155' }, petTextSelected: { color: '#fff', fontWeight: 'bold' }, chat: { flex: 1, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', padding: 10 }, message: { maxWidth: '84%', padding: 10, borderRadius: 11, marginBottom: 8 }, user: { alignSelf: 'flex-end', backgroundColor: '#2563eb' }, ia: { alignSelf: 'flex-start', backgroundColor: '#e2e8f0' }, userText: { color: '#fff' }, iaText: { color: '#1e293b' }, inputRow: { flexDirection: 'row', gap: 8, marginTop: 10 }, input: { flex: 1, backgroundColor: '#fff', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 9, padding: 10 }, send: { backgroundColor: '#2563eb', paddingHorizontal: 16, justifyContent: 'center', borderRadius: 9 }, sendText: { color: '#fff', fontWeight: 'bold' }, disclaimer: { textAlign: 'center', color: '#64748b', fontSize: 11, marginTop: 7 } });
+
+const criarEstilos = (cores: Cores) => StyleSheet.create({
+  pagina: { flex: 1, backgroundColor: cores.fundo, padding: 16 },
+  titulo: { fontSize: 26, fontWeight: 'bold' },
+  subtitulo: { color: cores.textoSecundario, marginVertical: 9 },
+  pets: { maxHeight: 45, marginBottom: 10 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    borderRadius: 18,
+    marginRight: 7,
+  },
+  chipAtivo: { backgroundColor: '#2563eb' },
+  chipTextoAtivo: { color: '#fff', fontWeight: 'bold' },
+  chat: {
+    flex: 1,
+    backgroundColor: cores.superficie,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    padding: 10,
+  },
+  mensagem: { maxWidth: '84%', padding: 10, borderRadius: 11, marginBottom: 8 },
+  mensagemUsuario: { alignSelf: 'flex-end', backgroundColor: '#2563eb' },
+  mensagemAssistente: { alignSelf: 'flex-start', backgroundColor: cores.fundoSecundario },
+  textoUsuario: { color: '#fff', fontWeight: 'bold' },
+  entrada: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  input: {
+    flex: 1,
+    color: cores.texto,
+    backgroundColor: cores.superficie,
+    borderColor: cores.borda,
+    borderWidth: 1,
+    borderRadius: 9,
+    padding: 10,
+  },
+  enviar: { backgroundColor: '#2563eb', paddingHorizontal: 16, justifyContent: 'center', borderRadius: 9 },
+  rodape: { color: cores.textoSecundario, textAlign: 'center', fontSize: 11, marginTop: 7 },
+  erro: { color: cores.perigo, marginBottom: 8 },
+});

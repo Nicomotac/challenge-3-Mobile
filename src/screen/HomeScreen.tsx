@@ -1,17 +1,63 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { DrawerNavigationProp } from '@react-navigation/drawer';
+import Text from '../components/ThemedText';
 import { useAuth } from '../context/AuthContext';
+import { useTema, type Cores } from '../theme/ThemeContext';
+import type { RootDrawerParamList } from '../navigation/navigation';
+
+const acoes: Array<{ rota: keyof RootDrawerParamList; titulo: string; descricao: string }> = [
+  { rota: 'Tutores', titulo: 'Tutores', descricao: 'Consulte os responsáveis cadastrados.' },
+  { rota: 'Pets', titulo: 'Pets', descricao: 'Visualize e gerencie os animais.' },
+  { rota: 'Triagem', titulo: 'Triagem de risco', descricao: 'Registre sintomas e consulte a avaliação.' },
+  { rota: 'Historico', titulo: 'Histórico', descricao: 'Acompanhe os resultados registrados.' },
+];
 
 export default function HomeScreen() {
   const { usuario } = useAuth();
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
+  const navegacao = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Clyvo PetCare</Text>
-      <Text style={styles.subtitle}>Cuidado contínuo e inteligente para pets.</Text>
-      <View style={styles.card}><Text style={styles.cardTitle}>Usuário</Text><Text>{usuario?.nome}</Text><Text>Perfil: {usuario?.role}</Text></View>
-      <View style={styles.card}><Text style={styles.cardTitle}>Como usar</Text><Text>Use o menu lateral para acessar Tutores, Pets, painel veterinário, cuidados, triagem, histórico e o Assistente IA.</Text></View>
-      <View style={styles.card}><Text style={styles.cardTitle}>Permissões</Text><Text>ADMIN pode criar, editar e excluir. USER pode consultar os dados cadastrados.</Text></View>
+    <ScrollView style={styles.pagina} contentContainerStyle={styles.conteudo}>
+      <Text style={styles.titulo}>Clyvo PetCare</Text>
+      <Text style={styles.subtitulo}>Cuidado contínuo para pets.</Text>
+      <View style={styles.card}>
+        <Text style={styles.cardTitulo}>Olá, {usuario?.nome ?? 'usuário'}!</Text>
+        <Text>Perfil de acesso: {usuario?.role === 'ADMIN' ? 'Administrador' : 'Consulta'}</Text>
+      </View>
+      <Text style={styles.secao}>Acesso rápido</Text>
+      {acoes.map((acao) => (
+        <TouchableOpacity
+          key={acao.rota}
+          style={styles.card}
+          onPress={() => navegacao.navigate(acao.rota)}
+          accessibilityRole="button"
+          accessibilityLabel={`Abrir ${acao.titulo}`}
+        >
+          <Text style={styles.cardTitulo}>{acao.titulo}</Text>
+          <Text>{acao.descricao}</Text>
+        </TouchableOpacity>
+      ))}
     </ScrollView>
   );
 }
-const styles = StyleSheet.create({ container: { flex: 1, padding: 20, backgroundColor: '#f8fafc' }, title: { fontSize: 30, fontWeight: 'bold', color: '#1e293b' }, subtitle: { color: '#64748b', marginTop: 5, marginBottom: 20 }, card: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 16, marginBottom: 12 }, cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#2563eb', marginBottom: 7 } });
+
+const criarEstilos = (cores: Cores) => StyleSheet.create({
+  pagina: { flex: 1, backgroundColor: cores.fundo },
+  conteudo: { padding: 20, paddingBottom: 36 },
+  titulo: { fontWeight: 'bold', fontSize: 30 },
+  subtitulo: { color: cores.textoSecundario, marginTop: 5, marginBottom: 20 },
+  secao: { fontWeight: 'bold', fontSize: 19, marginBottom: 12 },
+  card: {
+    backgroundColor: cores.superficie,
+    borderColor: cores.borda,
+    borderWidth: 1,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  cardTitulo: { fontWeight: 'bold', fontSize: 18, color: cores.primaria, marginBottom: 7 },
+});
