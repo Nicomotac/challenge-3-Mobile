@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CadastroUsuario, Credenciais } from '../model/Usuario';
+import type { CadastroUsuario, Credenciais } from '../model/Usuario';
 import { authService } from '../services/authService';
 
 export function useSessao() {
@@ -19,38 +19,40 @@ export function useSessao() {
   });
 }
 
-export function useEntrar() {
-  const client = useQueryClient();
-  return useMutation({
+export function useAcoesAuth() {
+  const queryClient = useQueryClient();
+  const chaveSessao = ['auth', 'session'] as const;
+
+  const login = useMutation({
     mutationFn: async (credenciais: Credenciais) => {
       const usuario = await authService.entrar(credenciais);
       await authService.salvarCredenciais(credenciais);
       return usuario;
     },
-    onSuccess: (usuario) => client.setQueryData(['auth', 'session'], usuario),
+    onSuccess: (usuario) => queryClient.setQueryData(chaveSessao, usuario),
   });
-}
 
-export function useCadastrarUsuario() {
-  const client = useQueryClient();
-  return useMutation({
+  const cadastro = useMutation({
     mutationFn: async (dados: CadastroUsuario) => {
       const usuario = await authService.cadastrar(dados);
-      await authService.salvarCredenciais({ username: dados.username, password: dados.password });
+      await authService.salvarCredenciais({
+        username: dados.username,
+        password: dados.password,
+      });
       return usuario;
     },
-    onSuccess: (usuario) => client.setQueryData(['auth', 'session'], usuario),
+    onSuccess: (usuario) => queryClient.setQueryData(chaveSessao, usuario),
   });
-}
 
-export function useSair() {
-  const client = useQueryClient();
-  return useMutation({
+  const logout = useMutation({
     mutationFn: authService.sair,
     onSuccess: () => {
-      client.setQueryData(['auth', 'session'], null);
-      client.removeQueries({ queryKey: ['tutores'] });
-      client.removeQueries({ queryKey: ['pets'] });
+      queryClient.setQueryData(chaveSessao, null);
+      queryClient.removeQueries({ queryKey: ['tutores'] });
+      queryClient.removeQueries({ queryKey: ['pets'] });
+      queryClient.removeQueries({ queryKey: ['historico-triagens'] });
     },
   });
+
+  return { login, cadastro, logout };
 }

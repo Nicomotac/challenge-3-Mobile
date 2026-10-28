@@ -1,6 +1,6 @@
-import React, { createContext, ReactNode, useContext } from 'react';
-import { CadastroUsuario, Credenciais, Usuario } from '../model/Usuario';
-import { useCadastrarUsuario, useEntrar, useSair, useSessao } from '../control/useAuthControl';
+import React, { createContext, type ReactNode, useContext } from 'react';
+import type { CadastroUsuario, Credenciais, Usuario } from '../model/Usuario';
+import { useAcoesAuth, useSessao } from '../control/useAuthControl';
 
 type AuthContextValue = {
   usuario: Usuario | null;
@@ -16,13 +16,11 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const sessao = useSessao();
-  const login = useEntrar();
-  const cadastro = useCadastrarUsuario();
-  const logout = useSair();
+  const { login, cadastro, logout } = useAcoesAuth();
 
   return (
     <AuthContext.Provider value={{
-      usuario: sessao.data || null,
+      usuario: sessao.data ?? null,
       carregandoSessao: sessao.isLoading,
       entrando: login.isPending,
       cadastrando: cadastro.isPending,
@@ -37,6 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const contexto = useContext(AuthContext);
-  if (!contexto) throw new Error('useAuth deve ser utilizado dentro de AuthProvider.');
+  if (!contexto) {
+    throw new Error('useAuth deve ser utilizado dentro de AuthProvider.');
+  }
   return contexto;
 }
