@@ -176,11 +176,9 @@ Documentação: [Expo EAS Build](https://docs.expo.dev/build/introduction/) · [
 
 O vídeo final deve registrar, no aplicativo realmente instalado e disponibilizado ao professor, os fluxos completos de login, tutores, pets, triagem, notificação, histórico, tema e a tela **Sobre o App**. Demonstrar o app sem cortes que ocultem erros e confirmar a versão distribuída. As funcionalidades não demonstradas podem não ser consideradas na correção.
 
-**Link do vídeo de entrega:** preencher após publicação.
+**Link do vídeo de entrega:** ###########################################
 
-**Link do repositório GitHub Classroom:** preencher quando disponibilizado.
-
-**Disponibilização ao professor:** convite do Firebase App Distribution com acesso ativo.
+**Disponibilização ao professor:** #########################################
 
 ## Verificação
 
