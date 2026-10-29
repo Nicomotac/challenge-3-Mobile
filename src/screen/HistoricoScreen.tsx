@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useHistoricoTriagem } from '../control/useHistoricoTriagem';
 import { usePets } from '../control/usePetControl';
 import { useTutores } from '../control/useTutorControl';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 
 export default function HistoricoScreen() {
   const { cores } = useTema();

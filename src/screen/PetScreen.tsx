@@ -11,7 +11,7 @@ import {
 import Text from '../components/ThemedText';
 import { usePetFormulario } from '../control/usePetFormulario';
 import { mensagemErroApi } from '../services/api';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 
 type ChaveTexto = 'nome' | 'idade' | 'especie' | 'raca' | 'sexo' | 'dataNascimento' | 'peso';
 

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Text from '../components/ThemedText';
 import { useAssistenteControl } from '../control/useAssistenteControl';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 
 export default function AssistenteIAScreen() {
   const { cores } = useTema();

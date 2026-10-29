@@ -5,7 +5,7 @@ import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import Text from '../components/ThemedText';
 import { usePets } from '../control/usePetControl';
 import { useTutores } from '../control/useTutorControl';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 import type { RootDrawerParamList } from '../navigation/navigation';
 
 export default function VetScreen() {

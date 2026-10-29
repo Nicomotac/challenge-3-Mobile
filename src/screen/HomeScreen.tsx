@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import Text from '../components/ThemedText';
 import { useAuth } from '../context/AuthContext';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 import type { RootDrawerParamList } from '../navigation/navigation';
 
 const acoes: Array<{ rota: keyof RootDrawerParamList; titulo: string; descricao: string }> = [

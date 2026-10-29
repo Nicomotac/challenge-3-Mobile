@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Text from '../components/ThemedText';
 import { useTriagemControl } from '../control/useTriagemControl';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 import type { SintomasTriagem } from '../model/Triagem';
 
 const campos = [

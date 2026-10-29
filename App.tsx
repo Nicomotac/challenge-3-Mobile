@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { navigationRef } from './src/navigation/navigation';
 import RootNavigator from './src/navigation/RootNavigator';
 import { Notifications } from './src/notifications/notificationService';
-import { TemaProvider, useTema } from './src/theme/ThemeContext';
+import { TemaProvider, useTema } from './src/Theme/themeContext';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1 } },

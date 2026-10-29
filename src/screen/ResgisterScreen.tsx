@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Text from '../components/ThemedText';
 import { useCadastroFormulario } from '../control/useCadastroFormulario';
 import type { PublicStackParamList } from '../navigation/navigation';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 
 type Props = NativeStackScreenProps<PublicStackParamList, 'Cadastro'>;
 

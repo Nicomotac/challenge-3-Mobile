@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Text from '../components/ThemedText';
 import { useAuth } from '../context/AuthContext';
-import { useTema, type Cores, type ModoTema } from '../theme/ThemeContext';
+import { useTema, type Cores, type ModoTema } from '../Theme/themeContext';
 
 const opcoes: Array<{ valor: ModoTema; titulo: string }> = [
   { valor: 'sistema', titulo: 'Seguir o sistema' },

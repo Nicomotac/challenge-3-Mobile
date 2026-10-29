@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text as NativeText, type TextProps } from 'react-native';
-import { useTema } from '../theme/ThemeContext';
+import { useTema } from '../Theme/themeContext';
 
 export default function ThemedText({ style, ...props }: TextProps) {
   const { cores } = useTema();

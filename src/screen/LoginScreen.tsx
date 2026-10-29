@@ -8,7 +8,7 @@ import cuteLogin from '../assets/cuteLogin.jpg';
 import Text from '../components/ThemedText';
 import { useLoginFormulario } from '../control/useLoginFormulario';
 import type { PublicStackParamList } from '../navigation/navigation';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 
 type Props = NativeStackScreenProps<PublicStackParamList, 'Login'>;
 

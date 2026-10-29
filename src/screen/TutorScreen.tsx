@@ -10,7 +10,7 @@ import {
 import Text from '../components/ThemedText';
 import { useTutorFormulario } from '../control/useTutorFormulario';
 import { mensagemErroApi } from '../services/api';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 
 export default function TutorScreen() {
   const { cores } = useTema();

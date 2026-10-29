@@ -6,7 +6,7 @@ import type { RootDrawerParamList } from '../navigation/navigation';
 import Text from '../components/ThemedText';
 import { usePets } from '../control/usePetControl';
 import { recomendacaoDeCuidados } from '../services/cuidadosService';
-import { useTema, type Cores } from '../theme/ThemeContext';
+import { useTema, type Cores } from '../Theme/themeContext';
 
 export default function CuidadosScreen() {
   const pets = usePets();
